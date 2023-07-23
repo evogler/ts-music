@@ -1,0 +1,14 @@
+TODO
+- switch between parts in random order & with non uniform times
+- more kinds of parts
+  - gradually changing
+  - something staccato
+- changing the pool of parts at different times
+- repeating chunks of the composite passage
+  - repeating chunks of a passage in general
+  - generate a part by doing intervals or something but then use repetition
+  - use to make drum part more specific
+- mute notes with varying odds over time
+- accented notes
+
+DONE

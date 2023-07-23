@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run your program and store the output
-output=$(tsc index.ts && node index.js)
+output=$(tsc src/index.ts && node src/index.js)
 
 # Check the exit code of the program
 if [ $? -eq 0 ]; then
