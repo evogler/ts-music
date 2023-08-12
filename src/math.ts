@@ -1,13 +1,15 @@
 export const rand = Math.random;
 
-export const randInt = (a: number, b: number): number =>
-  Math.floor(rand() * (b - a + 1)) + a;
+export const randStep = (a: number, b: number, c: number): number =>
+  Math.floor(rand() * ((b - a) / c + 1)) * c + a;
+
+export const randInt = (a: number, b: number): number => randStep(a, b, 1);
 
 export const choice = <T>(arr: T[]): T => arr.at(rand() * arr.length) as T;
 
 export const shuffled = <T>(arr: T[]): T[] => {
   // TODO: performance
-  const withIndices = arr.map((x, idx): [number, T] => [idx, x]);
+  const withIndices = arr.map((x): [number, T] => [rand(), x]);
   withIndices.sort((a, b) => b[0] - a[0]);
   return withIndices.map((item) => item[1]);
 };
@@ -24,9 +26,17 @@ export const sample =
   };
 
 export const withOdds =
-  <T>(a: T, b: T) =>
+  <T>(ifSo: T, ifNot: T) =>
   (odds: number) =>
-    rand() < odds ? a : b;
+    rand() < odds ? ifSo : ifNot;
+
+export const doWithOdds =
+  <T>(fn: () => unknown) =>
+  (odds: number) => {
+    if (rand() < odds) {
+      fn();
+    }
+  };
 
 export const mod = (divisor: number) => (dividend: number) =>
   ((dividend % divisor) + divisor) % divisor;
@@ -53,3 +63,50 @@ export const fitIn =
     const ratio = overallLength / sum;
     return durs.map((n) => n * ratio);
   };
+
+const comp = <T>(a: T, b: T): number => {
+  if (b < a) return 1;
+  if (a < b) return -1;
+  return 0;
+};
+
+export const sortedBy =
+  <T>(pred: (a: T) => unknown) =>
+  (arr: T[]): T[] => {
+    const res = [...arr];
+    res.sort((a, b) => comp(pred(a), pred(b)));
+    return res;
+  };
+
+export const _bisect =
+  (arr: number[]) =>
+  (n: number): number => {
+    if (n < arr[0]) return -1;
+    if (n > arr.slice(-1)[0]) return arr.length - 1;
+    let a = 0;
+    let b = arr.length;
+    while (a < b) {
+      const m = Math.floor((a + b) / 2);
+      const [a0, a1] = [arr[m], arr[m + 1]];
+      if (n >= a0 && n < a1) return m;
+      if (n > a0) a = m + 1;
+      else b = m;
+    }
+    return a;
+  };
+
+export const cumulative = (arr: number[], start = 0): number[] => {
+  const res = [start];
+  for (const n of arr) {
+    res.push(n + (res.at(-1) as number));
+  }
+  return res;
+};
+
+export const intervals = (arr: number[]): number[] => {
+  const res = [];
+  for (let i = 0; i < (arr.length - 1); i++) {
+    res.push (arr[i + 1] - arr[i]);
+  }
+  return res;
+}

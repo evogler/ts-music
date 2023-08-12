@@ -1,14 +1,18 @@
 TODO
-- switch between parts in random order & with non uniform times
 - more kinds of parts
   - gradually changing
-  - something staccato
 - changing the pool of parts at different times
 - repeating chunks of the composite passage
   - repeating chunks of a passage in general
   - generate a part by doing intervals or something but then use repetition
   - use to make drum part more specific
-- mute notes with varying odds over time
-- accented notes
+- transposeSections()
+- loopSections() (provide array of sections and pattern like AABA)
+- instead of or along with pitches, work with "sounds"
+  - a sound could be a specific chord, phrased a certain way by a set of instruments
+  - or it could be just the instruments and the phrasing, and maybe a harmonization
+
 
 DONE
+  - something staccato
+- make time-based odds a first-class concept
