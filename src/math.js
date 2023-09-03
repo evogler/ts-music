@@ -9,7 +9,8 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.intervals = exports.cumulative = exports._bisect = exports.sortedBy = exports.fitIn = exports.nthMod = exports.range = exports.windowMod = exports.mod = exports.doWithOdds = exports.withOdds = exports.sample = exports.shuffled = exports.choice = exports.randInt = exports.randStep = exports.rand = void 0;
+exports.sectionOdds = exports.oneTwoOdds = exports.oneOdds = exports.oddsType = exports.intervals = exports.cumulative = exports._bisect = exports.sortedBy = exports.comp = exports.fitIn = exports.nthMod = exports.range = exports.windowMod = exports.mod = exports.doWithOdds = exports.withOdds = exports.sample = exports.shuffled = exports.choice = exports.randInt = exports.randStep = exports.rand = void 0;
+var musicBuildingBlocks_1 = require("./musicBuildingBlocks");
 exports.rand = Math.random;
 var randStep = function (a, b, c) {
     return Math.floor((0, exports.rand)() * ((b - a) / c + 1)) * c + a;
@@ -89,10 +90,11 @@ var comp = function (a, b) {
         return -1;
     return 0;
 };
+exports.comp = comp;
 var sortedBy = function (pred) {
     return function (arr) {
         var res = __spreadArray([], arr, true);
-        res.sort(function (a, b) { return comp(pred(a), pred(b)); });
+        res.sort(function (a, b) { return (0, exports.comp)(pred(a), pred(b)); });
         return res;
     };
 };
@@ -131,9 +133,28 @@ var cumulative = function (arr, start) {
 exports.cumulative = cumulative;
 var intervals = function (arr) {
     var res = [];
-    for (var i = 0; i < (arr.length - 1); i++) {
+    for (var i = 0; i < arr.length - 1; i++) {
         res.push(arr[i + 1] - arr[i]);
     }
     return res;
 };
 exports.intervals = intervals;
+var oddsType = function (odds) { return ({ _type: "odds", value: odds }); };
+exports.oddsType = oddsType;
+var oneOdds = function (odds) {
+    return function () {
+        return (0, exports.oddsType)(odds);
+    };
+};
+exports.oneOdds = oneOdds;
+var oneTwoOdds = function (segmentLength, firstOdds, secondOdds) {
+    return function (note) {
+        return (0, exports.oddsType)(note.time % (2 * segmentLength) < segmentLength ? firstOdds : secondOdds);
+    };
+};
+exports.oneTwoOdds = oneTwoOdds;
+var sectionOdds = function (sectionLengths, odds) {
+    var getSection = (0, musicBuildingBlocks_1.sectionAtTime)(sectionLengths);
+    return function (note) { return (0, exports.oddsType)(odds[getSection(note)]); };
+};
+exports.sectionOdds = sectionOdds;

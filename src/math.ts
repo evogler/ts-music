@@ -1,3 +1,9 @@
+import { Note, sectionAtTime } from "./musicBuildingBlocks";
+
+export type Odds = { _type: "odds"; value: number };
+
+export type OddsFn = (note: Note) => Odds;
+
 export const rand = Math.random;
 
 export const randStep = (a: number, b: number, c: number): number =>
@@ -64,7 +70,7 @@ export const fitIn =
     return durs.map((n) => n * ratio);
   };
 
-const comp = <T>(a: T, b: T): number => {
+export const comp = <T>(a: T, b: T): number => {
   if (b < a) return 1;
   if (a < b) return -1;
   return 0;
@@ -105,8 +111,27 @@ export const cumulative = (arr: number[], start = 0): number[] => {
 
 export const intervals = (arr: number[]): number[] => {
   const res = [];
-  for (let i = 0; i < (arr.length - 1); i++) {
-    res.push (arr[i + 1] - arr[i]);
+  for (let i = 0; i < arr.length - 1; i++) {
+    res.push(arr[i + 1] - arr[i]);
   }
   return res;
-}
+};
+
+export const oddsType = (odds: number): Odds => ({ _type: "odds", value: odds });
+
+export const oneOdds =
+  (odds: number): OddsFn =>
+  () =>
+    oddsType(odds);
+
+export const oneTwoOdds =
+  (segmentLength: number, firstOdds: number, secondOdds: number): OddsFn =>
+  (note: Note) =>
+    oddsType(
+      note.time % (2 * segmentLength) < segmentLength ? firstOdds : secondOdds
+    );
+
+export const sectionOdds = (sectionLengths: number[], odds: number[]): OddsFn => {
+  const getSection = sectionAtTime(sectionLengths);
+  return (note: Note) => oddsType(odds[getSection(note)]);
+};
