@@ -146,10 +146,10 @@ export const sectionOdds = (sectionLengths: number[], odds: number[]): OddsFn =>
   return (note: Note) => oddsType(odds[getSection(note)]);
 };
 
-export const rampOdds = (from: number, to: number, timeSpan: number): OddsFn => {
-  const;
-  return (note: Note) => oddsType();
-};
+// export const rampOdds = (from: number, to: number, timeSpan: number): OddsFn => {
+//   const;
+//   return (note: Note) => oddsType();
+// };
 
 export const localShuffled =
   (offset: number) =>

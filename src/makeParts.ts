@@ -1,4 +1,4 @@
-import { take, cycle, Cycle, xx } from "./functional";
+import { take, cycle, Cycle, xx } from './functional';
 import {
   choice,
   doWithOdds,
@@ -13,7 +13,7 @@ import {
   sample,
   shuffled,
   withOdds,
-} from "./math";
+} from './math';
 import {
   Passage,
   PassageWithChannels,
@@ -31,8 +31,8 @@ import {
   NoteWithChannel,
   NoteWithChannelGroups,
   shiftNotesRandomly,
-} from "./musicBuildingBlocks";
-import { pipeline } from "./pipeline";
+} from './musicBuildingBlocks';
+import { pipeline } from './pipeline';
 
 export const makeRandIntPart = ({ window = [0, 36] as [number, number] }) => {
   const intCount = randInt(3, 4);
@@ -67,8 +67,7 @@ export const makeLoopNotesPart = ({
   durations?: number[];
 }) => {
   const pitches = sample(count)(range(24));
-  const durationOptions =
-    durations ?? sample(randInt(2, 4))([0.5, 0.5, 1, 1.5, 2]);
+  const durationOptions = durations ?? sample(randInt(2, 4))([0.5, 0.5, 1, 1.5, 2]);
   const _durations = pitches.map((_) => choice(durationOptions));
   const velocity = 50;
   let time = 0;
@@ -86,9 +85,7 @@ export const makeLoopNotesPart = ({
 export const makeCycleSwitcher = (): PassageWithChannels => {
   const totalNotes = 1500;
 
-  const addRandomChannelOrder = <T extends Note>(
-    note: T
-  ): T & { channels: number[] } => ({
+  const addRandomChannelOrder = <T extends Note>(note: T): T & { channels: number[] } => ({
     ...note,
     channels: sample(9)(range(0, 8 + 1)),
   });
@@ -102,8 +99,7 @@ export const makeCycleSwitcher = (): PassageWithChannels => {
       (x) => x.map(addRandomChannelOrder),
       cycle
     );
-  const cycles: Cycle<NoteWithTimeDuration & { channels: number[] }>[] =
-    xx(25)(partFn);
+  const cycles: Cycle<NoteWithTimeDuration & { channels: number[] }>[] = xx(25)(partFn);
 
   let res = [];
   let time = 0;
@@ -177,8 +173,8 @@ export const makeDrumPart = (): PassageWithChannels => {
   const durations = fitIn(16)(
     shuffled(
       [
-        2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2,
-        2, 2, 2, 3, 4, 5, 2, 2,
+        2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2,
+        2,
       ].map((n) => n + 3)
     )
   );

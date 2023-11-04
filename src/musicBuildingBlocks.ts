@@ -11,7 +11,7 @@ import {
   windowMod,
   cumulative,
   _bisect,
-} from "./math";
+} from './math';
 
 export type Note = {
   pitch: number;
@@ -54,10 +54,7 @@ export const pitchesToPassage = (pitches: number[]): Passage => {
   return passage;
 };
 
-export const pitchesAndDurationsToPassage = (
-  pitches: number[],
-  durations: number[]
-): Passage => {
+export const pitchesAndDurationsToPassage = (pitches: number[], durations: number[]): Passage => {
   let time = 0;
   const velocity = 50;
   const passage: Passage = [];
@@ -99,10 +96,7 @@ export const accentRandomly =
   (passage: Passage): Passage =>
     passage.map((note) => ({
       ...note,
-      velocity: withOdds(
-        Math.min(127, note.velocity + 15),
-        note.velocity
-      )(oddsFn(note).value),
+      velocity: withOdds(Math.min(127, note.velocity + 15), note.velocity)(oddsFn(note).value),
     }));
 
 export const staccatoRandomly =
@@ -282,9 +276,7 @@ export const flattenChannels = <T extends Note>(
 export const experimentalPitchToChord = (passage: Passage): Passage => {
   const randChord = () => sample(randInt(1, 3))(range(-12, 24));
   const chordCount = 24;
-  const chords = Object.fromEntries(
-    range(chordCount).map((n) => [n, randChord()])
-  );
+  const chords = Object.fromEntries(range(chordCount).map((n) => [n, randChord()]));
   const res: Passage = [];
   for (const note of passage) {
     const intervals = chords[mod(chordCount)(note.pitch)];

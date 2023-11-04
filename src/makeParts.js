@@ -138,8 +138,8 @@ var makeDrumPart = function () {
         { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
     ];
     var durations = (0, math_1.fitIn)(16)((0, math_1.shuffled)([
-        2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2,
-        2, 2, 2, 3, 4, 5, 2, 2,
+        2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2,
+        2,
     ].map(function (n) { return n + 3; })));
     while (time < length) {
         var nth = (0, math_1.nthMod)(idx);

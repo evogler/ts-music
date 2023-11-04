@@ -1,11 +1,11 @@
-import { pipeline } from "./pipeline";
-import { _bisect, choice, oneOdds, oneTwoOdds, randInt } from "./math";
+import { pipeline } from './pipeline';
+import { _bisect, choice, oneOdds, oneTwoOdds, randInt } from './math';
 import {
   makeAddingAndSubtractingPart,
   makeCycleSwitcher,
   makeDrumPart,
   makeHitsPart,
-} from "./makeParts";
+} from './makeParts';
 import {
   transposeByChannel,
   loopSectionNTimes,
@@ -17,11 +17,11 @@ import {
   combinePassagesSoloed,
   randomSections,
   velocityArc,
-} from "./musicBuildingBlocks";
+} from './musicBuildingBlocks';
 
 const main = () => {
   const bpm = 320;
-  const melodyPart = (durs = ([] as number[])) =>
+  const melodyPart = (durs = [] as number[]) =>
     pipeline(
       // makeCycleSwitcher(),
       makeAddingAndSubtractingPart({ durs }),
@@ -74,7 +74,7 @@ const main = () => {
       melodyPart(),
     ]),
     // addPassage(melodyPart()),
-    shiftNotesRandomly([/* -2, -1, 1, 2 */3])(oneTwoOdds(8, 0, 1)),
+    shiftNotesRandomly([/* -2, -1, 1, 2 */ 3])(oneTwoOdds(8, 0, 1)),
     addPassage(drumPart),
     // addPassage(makeHitsPart([64], 500)),
     velocityArc((note) => note),

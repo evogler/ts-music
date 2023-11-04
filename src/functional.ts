@@ -1,4 +1,4 @@
-export type Cycle<T> = { next: () => T};
+export type Cycle<T> = { next: () => T };
 
 export const cycle = <T>(arr: T[]): Cycle<T> => {
   let pos = 0;
@@ -24,4 +24,4 @@ export const xx =
       res.push(fn());
     }
     return res;
-  }
+  };

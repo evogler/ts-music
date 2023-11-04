@@ -11,12 +11,10 @@ const tryOne = (): number[] => {
     if (nextOptions.length === 0) {
       return res;
     }
-    const nextNote = nextOptions.at(
-      Math.random() * nextOptions.length
-    ) as number;
+    const nextNote = nextOptions.at(Math.random() * nextOptions.length) as number;
     const pos = options.indexOf(nextNote);
     options.splice(pos, 1);
-    res.push(nextNote)
+    res.push(nextNote);
     if (options.length === 0 && !looped) {
       options.push(0);
     }
@@ -29,8 +27,7 @@ while (best.length < 13) {
   const one = tryOne();
   counter += 1;
   if (one.length > best.length) {
-    console.log(counter, one.join(', '))
-    best = one
+    console.log(counter, one.join(', '));
+    best = one;
   }
 }
-
