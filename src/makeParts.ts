@@ -3,9 +3,12 @@ import {
   choice,
   doWithOdds,
   fitIn,
+  localShuffled,
   nthMod,
+  oneOdds,
   rand,
   randInt,
+  randRange,
   range,
   sample,
   shuffled,
@@ -16,7 +19,6 @@ import {
   PassageWithChannels,
   Note,
   NoteWithTimeDuration,
-  COWBELL,
   HAT,
   HAT_OPEN,
   KICK,
@@ -25,6 +27,10 @@ import {
   flattenChannels,
   pitchesAndDurationsToPassage,
   pitchesByRandIntervals,
+  CRASH,
+  NoteWithChannel,
+  NoteWithChannelGroups,
+  shiftNotesRandomly,
 } from "./musicBuildingBlocks";
 import { pipeline } from "./pipeline";
 
@@ -132,10 +138,13 @@ export const makeHitsPart = (
   const sectionLengthsCycle = cycle(sectionLengths);
   const velocity = 120;
   const duration = 0.5;
-  const pitch = COWBELL;
+  // const pitches = [COWBELL, KICK, SNARE, HAT];
+  const pitches = [CRASH];
   const channel = 9;
   while (time < totalLength) {
-    res.push({ time, pitch, duration, velocity, channel });
+    for (const pitch of pitches) {
+      res.push({ time, pitch, duration, velocity, channel });
+    }
     time += sectionLengthsCycle.next();
   }
   return res;
@@ -152,13 +161,26 @@ export const makeDrumPart = (): PassageWithChannels => {
     { pitch: HAT, velocity: 20, odds: 0.3 },
     { pitch: HAT, velocity: 60, odds: 0.8 },
     { pitch: HAT, velocity: 20, odds: 0.3 },
+    { pitch: HAT, velocity: 60, odds: 0.8 },
+    { pitch: HAT, velocity: 20, odds: 0.3 },
+    { pitch: HAT, velocity: 60, odds: 0.8 },
+    { pitch: HAT, velocity: 20, odds: 0.3 },
     { pitch: SNARE, velocity: 90, odds: 1 },
+    { pitch: HAT, velocity: 20, odds: 0.3 },
+    { pitch: HAT, velocity: 60, odds: 0.8 },
+    { pitch: HAT, velocity: 20, odds: 0.3 },
+    { pitch: HAT, velocity: 60, odds: 0.8 },
     { pitch: HAT, velocity: 20, odds: 0.3 },
     { pitch: HAT, velocity: 60, odds: 0.8 },
     { pitch: HAT, velocity: 20, odds: 0.3 },
   ];
   const durations = fitIn(16)(
-    shuffled([2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2].map((n) => n - 1))
+    shuffled(
+      [
+        2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2,
+        2, 2, 2, 3, 4, 5, 2, 2,
+      ].map((n) => n + 3)
+    )
   );
   while (time < length) {
     const nth = nthMod(idx);
@@ -173,4 +195,101 @@ export const makeDrumPart = (): PassageWithChannels => {
     idx += 1;
   }
   return res;
+};
+
+export const makeAddingAndSubtractingPart = ({
+  durs = [],
+}: {
+  durs?: number[];
+}): PassageWithChannels => {
+  // XXX: relative vs absolute time not accounted for in types
+  const numberOfSteps = 1240;
+  const minCellSize = 1;
+  const maxCellSize = 2;
+  const startCellSize = 2;
+  const changeOdds = 0.1;
+
+  const randNote = (): NoteWithChannelGroups => {
+    const time = choice(
+      durs.length > 0
+        ? durs
+        : [
+            0.125,
+            0.125,
+            0.125,
+            0.125,
+            0.5,
+            0.5,
+            1,
+            1.5,
+            randRange(0.25, 1.0),
+            randRange(0.25, 1.0),
+            randRange(0.25, 1.0),
+            randRange(0.25, 1.0),
+            randRange(0.5, 1.5),
+          ]
+    );
+    const duration = choice([time, time, 0.25]);
+    return {
+      channels: sample(randInt(1, 4))(range(8)),
+      // channels: sample(randInt(1, 3))([0, 2, 4]),
+      duration,
+      pitch: randInt(0, 24),
+      time,
+      velocity: 70,
+    };
+  };
+
+  const absolutizeTimes =
+    (startTime = 0) =>
+    <T extends Passage>(passage: T): T => {
+      let time = startTime;
+      const res = [];
+      for (const note of passage) {
+        res.push({ ...note, time });
+        time += note.time;
+      }
+      return res as T;
+    };
+
+  type Step = NoteWithChannelGroups[];
+  const firstStep = xx(startCellSize)(randNote);
+  const steps: Step[] = [firstStep];
+
+  const nextStep = (lastStep: Step): Step => {
+    const newStep = [...lastStep];
+
+    doWithOdds(() => {
+      if (newStep.length >= maxCellSize) return;
+      const newNotePos = randInt(0, newStep.length - 1);
+      const newNote = randNote();
+      newStep.splice(newNotePos, 0, newNote);
+    })(changeOdds);
+
+    doWithOdds(() => {
+      if (newStep.length <= minCellSize) return;
+      const deletePos = randInt(0, newStep.length - 1);
+      newStep.splice(deletePos, 1);
+    })(changeOdds);
+
+    return newStep;
+  };
+
+  for (let step = 1; step < numberOfSteps; step++) {
+    steps.push(nextStep(steps.at(-1) as Step));
+  }
+
+  const res = pipeline(
+    // shuffled(steps).flat(1),
+    steps,
+    localShuffled(20),
+    // shuffled,
+    (_) => _.flat(1),
+    absolutizeTimes(0),
+    shiftNotesRandomly([-3, -2, -1, 1, 2, 3])(oneOdds(0.1)),
+    flattenChannels
+  );
+  // console.log(res);
+  return res;
+  // return [];
 };

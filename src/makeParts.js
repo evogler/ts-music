@@ -10,8 +10,17 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeDrumPart = exports.makeHitsPart = exports.makeCycleSwitcher = exports.makeLoopNotesPart = exports.makeRandIntPart = void 0;
+exports.makeAddingAndSubtractingPart = exports.makeDrumPart = exports.makeHitsPart = exports.makeCycleSwitcher = exports.makeLoopNotesPart = exports.makeRandIntPart = void 0;
 var functional_1 = require("./functional");
 var math_1 = require("./math");
 var musicBuildingBlocks_1 = require("./musicBuildingBlocks");
@@ -92,10 +101,14 @@ var makeHitsPart = function (sectionLengths, totalLength, startTime) {
     var sectionLengthsCycle = (0, functional_1.cycle)(sectionLengths);
     var velocity = 120;
     var duration = 0.5;
-    var pitch = musicBuildingBlocks_1.COWBELL;
+    // const pitches = [COWBELL, KICK, SNARE, HAT];
+    var pitches = [musicBuildingBlocks_1.CRASH];
     var channel = 9;
     while (time < totalLength) {
-        res.push({ time: time, pitch: pitch, duration: duration, velocity: velocity, channel: channel });
+        for (var _i = 0, pitches_1 = pitches; _i < pitches_1.length; _i++) {
+            var pitch = pitches_1[_i];
+            res.push({ time: time, pitch: pitch, duration: duration, velocity: velocity, channel: channel });
+        }
         time += sectionLengthsCycle.next();
     }
     return res;
@@ -111,12 +124,23 @@ var makeDrumPart = function () {
         { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
         { pitch: musicBuildingBlocks_1.HAT, velocity: 60, odds: 0.8 },
         { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
+        { pitch: musicBuildingBlocks_1.HAT, velocity: 60, odds: 0.8 },
+        { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
+        { pitch: musicBuildingBlocks_1.HAT, velocity: 60, odds: 0.8 },
+        { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
         { pitch: musicBuildingBlocks_1.SNARE, velocity: 90, odds: 1 },
         { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
         { pitch: musicBuildingBlocks_1.HAT, velocity: 60, odds: 0.8 },
         { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
+        { pitch: musicBuildingBlocks_1.HAT, velocity: 60, odds: 0.8 },
+        { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
+        { pitch: musicBuildingBlocks_1.HAT, velocity: 60, odds: 0.8 },
+        { pitch: musicBuildingBlocks_1.HAT, velocity: 20, odds: 0.3 },
     ];
-    var durations = (0, math_1.fitIn)(16)((0, math_1.shuffled)([2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2].map(function (n) { return n - 1; })));
+    var durations = (0, math_1.fitIn)(16)((0, math_1.shuffled)([
+        2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2, 2, 2, 2, 3, 4, 5, 2, 2,
+        2, 2, 2, 3, 4, 5, 2, 2,
+    ].map(function (n) { return n + 3; })));
     while (time < length) {
         var nth = (0, math_1.nthMod)(idx);
         var _a = nth(notes), _pitch = _a.pitch, velocity = _a.velocity, odds = _a.odds;
@@ -132,3 +156,84 @@ var makeDrumPart = function () {
     return res;
 };
 exports.makeDrumPart = makeDrumPart;
+var makeAddingAndSubtractingPart = function (_a) {
+    var _b = _a.durs, durs = _b === void 0 ? [] : _b;
+    // XXX: relative vs absolute time not accounted for in types
+    var numberOfSteps = 1240;
+    var minCellSize = 1;
+    var maxCellSize = 2;
+    var startCellSize = 2;
+    var changeOdds = 0.1;
+    var randNote = function () {
+        var time = (0, math_1.choice)(durs.length > 0
+            ? durs
+            : [
+                0.125,
+                0.125,
+                0.125,
+                0.125,
+                0.5,
+                0.5,
+                1,
+                1.5,
+                (0, math_1.randRange)(0.25, 1.0),
+                (0, math_1.randRange)(0.25, 1.0),
+                (0, math_1.randRange)(0.25, 1.0),
+                (0, math_1.randRange)(0.25, 1.0),
+                (0, math_1.randRange)(0.5, 1.5),
+            ]);
+        var duration = (0, math_1.choice)([time, time, 0.25]);
+        return {
+            channels: (0, math_1.sample)((0, math_1.randInt)(1, 4))((0, math_1.range)(8)),
+            // channels: sample(randInt(1, 3))([0, 2, 4]),
+            duration: duration,
+            pitch: (0, math_1.randInt)(0, 24),
+            time: time,
+            velocity: 70,
+        };
+    };
+    var absolutizeTimes = function (startTime) {
+        if (startTime === void 0) { startTime = 0; }
+        return function (passage) {
+            var time = startTime;
+            var res = [];
+            for (var _i = 0, passage_1 = passage; _i < passage_1.length; _i++) {
+                var note = passage_1[_i];
+                res.push(__assign(__assign({}, note), { time: time }));
+                time += note.time;
+            }
+            return res;
+        };
+    };
+    var firstStep = (0, functional_1.xx)(startCellSize)(randNote);
+    var steps = [firstStep];
+    var nextStep = function (lastStep) {
+        var newStep = __spreadArray([], lastStep, true);
+        (0, math_1.doWithOdds)(function () {
+            if (newStep.length >= maxCellSize)
+                return;
+            var newNotePos = (0, math_1.randInt)(0, newStep.length - 1);
+            var newNote = randNote();
+            newStep.splice(newNotePos, 0, newNote);
+        })(changeOdds);
+        (0, math_1.doWithOdds)(function () {
+            if (newStep.length <= minCellSize)
+                return;
+            var deletePos = (0, math_1.randInt)(0, newStep.length - 1);
+            newStep.splice(deletePos, 1);
+        })(changeOdds);
+        return newStep;
+    };
+    for (var step = 1; step < numberOfSteps; step++) {
+        steps.push(nextStep(steps.at(-1)));
+    }
+    var res = (0, pipeline_1.pipeline)(
+    // shuffled(steps).flat(1),
+    steps, (0, math_1.localShuffled)(20), 
+    // shuffled,
+    function (_) { return _.flat(1); }, absolutizeTimes(0), (0, musicBuildingBlocks_1.shiftNotesRandomly)([-3, -2, -1, 1, 2, 3])((0, math_1.oneOdds)(0.1)), musicBuildingBlocks_1.flattenChannels);
+    // console.log(res);
+    return res;
+    // return [];
+};
+exports.makeAddingAndSubtractingPart = makeAddingAndSubtractingPart;

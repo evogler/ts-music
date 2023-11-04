@@ -9,7 +9,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sectionOdds = exports.oneTwoOdds = exports.oneOdds = exports.oddsType = exports.intervals = exports.cumulative = exports._bisect = exports.sortedBy = exports.comp = exports.fitIn = exports.nthMod = exports.range = exports.windowMod = exports.mod = exports.doWithOdds = exports.withOdds = exports.sample = exports.shuffled = exports.choice = exports.randInt = exports.randStep = exports.rand = void 0;
+exports.localShuffled = exports.sectionOdds = exports.oneTwoOdds = exports.oneOdds = exports.oddsType = exports.intervals = exports.cumulative = exports._bisect = exports.sortedBy = exports.comp = exports.fitIn = exports.nthMod = exports.range = exports.windowMod = exports.mod = exports.doWithOdds = exports.withOdds = exports.sample = exports.shuffled = exports.choice = exports.randRange = exports.randInt = exports.randStep = exports.rand = void 0;
 var musicBuildingBlocks_1 = require("./musicBuildingBlocks");
 exports.rand = Math.random;
 var randStep = function (a, b, c) {
@@ -18,6 +18,8 @@ var randStep = function (a, b, c) {
 exports.randStep = randStep;
 var randInt = function (a, b) { return (0, exports.randStep)(a, b, 1); };
 exports.randInt = randInt;
+var randRange = function (a, b) { return (0, exports.rand)() * (b - a) + a; };
+exports.randRange = randRange;
 var choice = function (arr) { return arr.at((0, exports.rand)() * arr.length); };
 exports.choice = choice;
 var shuffled = function (arr) {
@@ -44,13 +46,11 @@ var withOdds = function (ifSo, ifNot) {
     };
 };
 exports.withOdds = withOdds;
-var doWithOdds = function (fn) {
-    return function (odds) {
-        if ((0, exports.rand)() < odds) {
-            fn();
-        }
-    };
-};
+var doWithOdds = function (fn) { return function (odds) {
+    if ((0, exports.rand)() < odds) {
+        fn();
+    }
+}; };
 exports.doWithOdds = doWithOdds;
 var mod = function (divisor) { return function (dividend) {
     return ((dividend % divisor) + divisor) % divisor;
@@ -139,7 +139,10 @@ var intervals = function (arr) {
     return res;
 };
 exports.intervals = intervals;
-var oddsType = function (odds) { return ({ _type: "odds", value: odds }); };
+var oddsType = function (odds) { return ({
+    _type: "odds",
+    value: odds,
+}); };
 exports.oddsType = oddsType;
 var oneOdds = function (odds) {
     return function () {
@@ -158,3 +161,20 @@ var sectionOdds = function (sectionLengths, odds) {
     return function (note) { return (0, exports.oddsType)(odds[getSection(note)]); };
 };
 exports.sectionOdds = sectionOdds;
+// export const rampOdds = (from: number, to: number, timeSpan: number): OddsFn => {
+//   return (note: Note) => oddsType()
+// }
+var localShuffled = function (offset) {
+    return function (arr) {
+        var newArr = arr.map(function (val, idx) { return [
+            idx + (0, exports.randRange)(-offset, offset),
+            val,
+        ]; });
+        newArr.sort(function (a, b) { return a[0] - b[0]; });
+        return newArr.map(function (_a) {
+            var _ = _a[0], val = _a[1];
+            return val;
+        });
+    };
+};
+exports.localShuffled = localShuffled;

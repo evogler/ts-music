@@ -1,6 +1,6 @@
-import { Note, sectionAtTime } from "./musicBuildingBlocks";
+import { Note, sectionAtTime } from './musicBuildingBlocks';
 
-export type Odds = { _type: "odds"; value: number };
+export type Odds = { _type: 'odds'; value: number };
 
 export type OddsFn = (note: Note) => Odds;
 
@@ -10,6 +10,8 @@ export const randStep = (a: number, b: number, c: number): number =>
   Math.floor(rand() * ((b - a) / c + 1)) * c + a;
 
 export const randInt = (a: number, b: number): number => randStep(a, b, 1);
+
+export const randRange = (a: number, b: number): number => rand() * (b - a) + a;
 
 export const choice = <T>(arr: T[]): T => arr.at(rand() * arr.length) as T;
 
@@ -36,13 +38,11 @@ export const withOdds =
   (odds: number) =>
     rand() < odds ? ifSo : ifNot;
 
-export const doWithOdds =
-  <T>(fn: () => unknown) =>
-  (odds: number) => {
-    if (rand() < odds) {
-      fn();
-    }
-  };
+export const doWithOdds = (fn: () => unknown) => (odds: number) => {
+  if (rand() < odds) {
+    fn();
+  }
+};
 
 export const mod = (divisor: number) => (dividend: number) =>
   ((dividend % divisor) + divisor) % divisor;
@@ -51,6 +51,15 @@ export const windowMod =
   ([a, b]: [number, number]) =>
   (n: number) =>
     mod(b - a)(n) + a;
+
+export const window =
+  ([a, b]: [number, number]) =>
+  (n: number) => {
+    if (n < a) return a;
+    if (n >= b) return b;
+    const percent = (n - a) / (b - a);
+    return b * percent + a * (1 - percent);
+  };
 
 export const range = (a: number, b?: number): number[] => {
   if (b === undefined) return range(0, a);
@@ -117,7 +126,10 @@ export const intervals = (arr: number[]): number[] => {
   return res;
 };
 
-export const oddsType = (odds: number): Odds => ({ _type: "odds", value: odds });
+export const oddsType = (odds: number): Odds => ({
+  _type: 'odds',
+  value: odds,
+});
 
 export const oneOdds =
   (odds: number): OddsFn =>
@@ -127,11 +139,22 @@ export const oneOdds =
 export const oneTwoOdds =
   (segmentLength: number, firstOdds: number, secondOdds: number): OddsFn =>
   (note: Note) =>
-    oddsType(
-      note.time % (2 * segmentLength) < segmentLength ? firstOdds : secondOdds
-    );
+    oddsType(note.time % (2 * segmentLength) < segmentLength ? firstOdds : secondOdds);
 
 export const sectionOdds = (sectionLengths: number[], odds: number[]): OddsFn => {
   const getSection = sectionAtTime(sectionLengths);
   return (note: Note) => oddsType(odds[getSection(note)]);
 };
+
+export const rampOdds = (from: number, to: number, timeSpan: number): OddsFn => {
+  const;
+  return (note: Note) => oddsType();
+};
+
+export const localShuffled =
+  (offset: number) =>
+  <T>(arr: T[]): T[] => {
+    const newArr: [number, T][] = arr.map((val, idx) => [idx + randRange(-offset, offset), val]);
+    newArr.sort((a, b) => a[0] - b[0]);
+    return newArr.map(([_, val]) => val);
+  };

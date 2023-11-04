@@ -31,12 +31,13 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sectionAtTime = exports.pitchesByRandIntervals = exports.toScale = exports.experimentalPitchToChord = exports.flattenChannels = exports.transposeByChannel = exports.addTimeDurations = exports.randomSections = exports.combinePassagesSoloed = exports.addPassage = exports.loopSectionNTimes = exports.exciseSection = exports.combinePassages = exports.sortedByTime = exports.sortByTime = exports.passageToJsonSong = exports.offsetTime = exports.transpose = exports.keepRandomly = exports.deleteNotesRandomly = exports.staccatoRandomly = exports.accentRandomly = exports.shiftNotesRandomly = exports.randomizeOctave = exports.addChannel = exports.pitchesAndDurationsToPassage = exports.pitchesToPassage = exports.COWBELL = exports.HAT_OPEN = exports.HAT = exports.SNARE = exports.KICK = void 0;
+exports.velocityArc = exports.sectionAtTime = exports.pitchesByRandIntervals = exports.toScale = exports.experimentalPitchToChord = exports.flattenChannels = exports.transposeByChannel = exports.addTimeDurations = exports.randomSections = exports.combinePassagesSoloed = exports.addPassage = exports.loopSectionNTimes = exports.exciseSection = exports.combinePassages = exports.sortedByTime = exports.sortByTime = exports.passageToJsonSong = exports.offsetTime = exports.transpose = exports.keepRandomly = exports.deleteNotesRandomly = exports.staccatoRandomly = exports.accentRandomly = exports.shiftNotesRandomly = exports.randomizeOctave = exports.addChannel = exports.pitchesAndDurationsToPassage = exports.pitchesToPassage = exports.COWBELL = exports.CRASH = exports.HAT_OPEN = exports.HAT = exports.SNARE = exports.KICK = void 0;
 var math_1 = require("./math");
 exports.KICK = 36;
 exports.SNARE = 38;
 exports.HAT = 42;
 exports.HAT_OPEN = 46;
+exports.CRASH = 49;
 exports.COWBELL = 56;
 var pitchesToPassage = function (pitches) {
     var time = 0;
@@ -325,3 +326,9 @@ var sectionAtTime = function (sectionLengths) {
     return function (note) { return __bisect(note.time % loopLen); };
 };
 exports.sectionAtTime = sectionAtTime;
+var velocityArc = function (velocityFn) {
+    return function (passage) {
+        return passage;
+    };
+};
+exports.velocityArc = velocityArc;

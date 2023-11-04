@@ -1,4 +1,17 @@
-import { choice, OddsFn, withOdds, rand, randInt, randStep, sample, range, mod, windowMod, cumulative, _bisect } from "./math";
+import {
+  choice,
+  OddsFn,
+  withOdds,
+  rand,
+  randInt,
+  randStep,
+  sample,
+  range,
+  mod,
+  windowMod,
+  cumulative,
+  _bisect,
+} from "./math";
 
 export type Note = {
   pitch: number;
@@ -21,6 +34,7 @@ export const KICK = 36;
 export const SNARE = 38;
 export const HAT = 42;
 export const HAT_OPEN = 46;
+export const CRASH = 49;
 export const COWBELL = 56;
 
 export const pitchesToPassage = (pitches: number[]): Passage => {
@@ -74,11 +88,11 @@ export const randomizeOctave =
 export const shiftNotesRandomly =
   (intervals: number[]) =>
   (oddsFn: OddsFn) =>
-  (passage: Passage): Passage =>
+  <T extends Passage>(passage: T): T =>
     passage.map((note) => ({
       ...note,
       pitch: note.pitch + withOdds(choice(intervals), 0)(oddsFn(note).value),
-    }));
+    })) as T;
 
 export const accentRandomly =
   (oddsFn: OddsFn) =>
@@ -319,3 +333,9 @@ export const sectionAtTime = (sectionLengths: number[]) => {
   const loopLen = cums.at(-1) as number;
   return (note: Note): number => __bisect(note.time % loopLen);
 };
+
+export const velocityArc =
+  (velocityFn: <T extends { time: number }>(note: T) => T) =>
+  <U extends Passage>(passage: U): U => {
+    return passage;
+  };
